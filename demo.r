@@ -8,6 +8,7 @@ setwd("~/Dropbox/teaching/UCL-R")	# set the working directory like this.
 
 # read stata data with function read.dta() from library "foreign"
 library(foreign)	# load library "foreign". type help(package="foreign") to see what file formats can be read.
+# a "library" (or a package) is a collection of functions, data, and other things that are not loaded by default. users can write their own libraries. there is a central repository for libraries (CRAN), where you can download libraries that underwent a certain level of quality control. to obtain a package you don't have, let's say ggplt2, just type install.packages("ggplot2")
 fesdat <- read.dta("fesdat2005.dta")	# you can use "<-" or "=" to assign some value to an object. use "<-" if you want to be called a proper useR by your friends. 
 
 # show first couple of observations
