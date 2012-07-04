@@ -1,6 +1,7 @@
-# R shot at James Banks' stata demonstration
+# R shot at James Banks' stata demonstration. 
+# you can get the original stata file at https://moodle.ucl.ac.uk/course/view.php?id=8932 (ECONG100 moodle)
 
-setwd("~/Dropbox/teaching/UCL-R")	# i set the working directory like this. 
+setwd("~/Dropbox/teaching/UCL-R")	# set the working directory like this. 
 
 # task 1: read two datasets and merge them
 # --------------------------------------
