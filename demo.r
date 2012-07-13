@@ -101,3 +101,72 @@ table(alldata$agecat)	# table function produces a contigency table for factors
 summary(alldata$ageced)
 alldata$educat <- cut(x=alldata$ageced,breaks = c(0,16,19,98),right=FALSE)
 summary(alldata$educat)
+
+
+# task 5: specify a model
+# -----------------------
+
+alldata <- alldata[!is.na(alldata$lndex),]
+log.model <- lm(data = subset(alldata,wfoodin > 0),formula = log(wfoodin) ~ lndex)	# lm() is the 'linear model' function. type help(lm)
+summary(log.model)
+coef(log.model)		# prints the coefficients
+# easy to visualize a 2 variable model:
+ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin))) + geom_point(alpha=0.3) + geom_abline(intercept = coef(log.model)[1], slope = coef(log.model)[2],color="red")
+
+# "add" stuff. that is 'update()' in R.
+# e.g. "add an age category dummy".
+log.model2 <- update(log.model, . ~ . + educat)	# that means "take model 'log.model', leave the LHS as is (that's the '.'), leave the RHS as is, but add variable 'agecat'".
+summary(log.model2)	# prints a summary of the model.
+# plot with different intercepts
+ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin),color=educat)) + geom_point(alpha=0.6) + geom_abline(intercept = coef(log.model2)[1], slope = coef(log.model2)[2],color="red") + geom_abline(intercept = sum(coef(log.model2)[c(1,3)]), slope = coef(log.model2)[2],color="green") + geom_abline(intercept = sum(coef(log.model2)[c(1,4)]), slope = coef(log.model2)[2],color="blue")
+
+
+log.model3 <- update(log.model2, . ~ . + agecat)	
+summary(log.model2)	# let's see that
+log.model3 <- update(log.model3, . ~ . - educat)	# remove educat 
+summary(log.model3)
+
+
+# TODO iv reg
+
+# add an interaction
+log.model4 <- update(log.model, . ~ . + educat * agecat)	# adds all levels of educat, agecat, and agecat*educat
+summary(log.model4)
+
+
+# task 6: age profile of nondurable consumption
+# =============================================
+
+p1 <- ggplot(alldata, aes(y=ndex,x=age)) 	# base layer mapping age and nondurable expenditure
+p1 + geom_point( alpha = 0.3 )	# points
+
+qplot(data=alldata, x=ndex, geom = "density")	# short way of wrigin ggplot
+ggplot(alldata,aes(x=ndex,color=educat)) + geom_density()	# by educat
+ggplot(subset(alldata,ndex < 2000),aes(x=ndex,color=educat)) + geom_density()	# by educat and subset
+
+
+# fit a quantile regression model on a 5-order polynomial of age
+qreg <- rq( formula =  ndex ~ age , data=alldata, tau=0.5)
+qreg2 <- update(qreg, .~. + I(age^2) + I(age^3) + I(age^4) + I(age^5))
+
+# compare to mean and other quantiles
+lm.model <- lm(formula = ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5),data = alldata)
+qreg10 <- update(qreg2, tau = 0.1)
+qreg30 <- update(qreg2, tau = 0.3)
+qreg70 <- update(qreg2, tau = 0.7)
+qreg90 <- update(qreg2, tau = 0.9)
+
+ages <- sort(unique(alldata$age))
+# collect predicted values
+preds <- data.frame(age = ages, ols= predict(object = lm.model, newdata = data.frame(age = seq(range(alldata$age)[1],range(alldata$age)[2],length=length(unique(alldata$age))))))
+preds$qr50 <- predict(object = areg50, newdata = data.frame(age = preds$age))
+preds$qr10 <- predict(object = qreg10, newdata = data.frame(age = preds$age))
+preds$qr30 <- predict(object = qreg30, newdata = data.frame(age = preds$age))
+preds$qr70 <- predict(object = qreg70, newdata = data.frame(age = preds$age))
+preds$qr90 <- predict(object = qreg90, newdata = data.frame(age = preds$age))
+
+library(reshape)
+melt.preds <- melt(preds, id.vars="age")
+ggplot(data=melt.preds, aes(x=age,y=value,color=variable)) + geom_line()
+
+
