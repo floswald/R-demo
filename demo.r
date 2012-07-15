@@ -143,23 +143,24 @@ p1 + geom_point( alpha = 0.3 )	# points
 qplot(data=alldata, x=ndex, geom = "density")	# short way of wrigin ggplot
 ggplot(alldata,aes(x=ndex,color=educat)) + geom_density()	# by educat
 ggplot(subset(alldata,ndex < 2000),aes(x=ndex,color=educat)) + geom_density()	# by educat and subset
-
+stop()
 
 # fit a quantile regression model on a 5-order polynomial of age
+library(quantreg)
 qreg <- rq( formula =  ndex ~ age , data=alldata, tau=0.5)
-qreg2 <- update(qreg, .~. + I(age^2) + I(age^3) + I(age^4) + I(age^5))
+qreg50 <- update(qreg, .~. + I(age^2) + I(age^3) + I(age^4) + I(age^5))
 
 # compare to mean and other quantiles
 lm.model <- lm(formula = ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5),data = alldata)
-qreg10 <- update(qreg2, tau = 0.1)
-qreg30 <- update(qreg2, tau = 0.3)
-qreg70 <- update(qreg2, tau = 0.7)
-qreg90 <- update(qreg2, tau = 0.9)
+qreg10 <- update(qreg50, tau = 0.1)
+qreg30 <- update(qreg50, tau = 0.3)
+qreg70 <- update(qreg50, tau = 0.7)
+qreg90 <- update(qreg50, tau = 0.9)
 
 ages <- sort(unique(alldata$age))
 # collect predicted values
 preds <- data.frame(age = ages, ols= predict(object = lm.model, newdata = data.frame(age = seq(range(alldata$age)[1],range(alldata$age)[2],length=length(unique(alldata$age))))))
-preds$qr50 <- predict(object = areg50, newdata = data.frame(age = preds$age))
+preds$qr50 <- predict(object = qreg50, newdata = data.frame(age = preds$age))
 preds$qr10 <- predict(object = qreg10, newdata = data.frame(age = preds$age))
 preds$qr30 <- predict(object = qreg30, newdata = data.frame(age = preds$age))
 preds$qr70 <- predict(object = qreg70, newdata = data.frame(age = preds$age))
