@@ -106,19 +106,33 @@ summary(alldata$educat)
 # task 5: specify a model
 # -----------------------
 
-alldata <- alldata[!is.na(alldata$lndex),]
-log.model <- lm(data = subset(alldata,wfoodin > 0),formula = log(wfoodin) ~ lndex)	# lm() is the 'linear model' function. type help(lm)
-summary(log.model)
+alldata <- alldata[!is.na(alldata$lndex),]	# get rid of NA entries in lndex
+log.model <- lm(data = subset(alldata,wfoodin > 0),formula = log(wfoodin) ~ lndex)	# lm() is the 'linear model' function. type help(lm). subset to wfoodin>0 becaouse of log# lm() uses the formula interface, which is common in many R functions. a formula has a LHS and a RHS. we want to explain LHS by RHS variables. we say that
+# "LHS explained by RHS", and that is in R "LHS ~ RHS". RHS can be any number of variables, or functions thereof>
+# y ~ x + y + z
+# y ~ x + y + z + y*z
+# y ~ x + I(y^2) + z	the I() function takes an algebraic expression and takes it literally (i.e. makes sure the "^" operator gets passed as the "power" function into the formula, and not any other meaning it might have in R.
+      
+summary(log.model)	# look at the regression output
 coef(log.model)		# prints the coefficients
 # easy to visualize a 2 variable model:
-ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin))) + geom_point(alpha=0.3) + geom_abline(intercept = coef(log.model)[1], slope = coef(log.model)[2],color="red")
+plot.model <- ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin)))		# take subset of alldata, and map lndex as "x" and log(wfoodin) as "y"
+plot.model	# empty plot: no layers!
+plot.model <- plot.model + geom_point(alpha=0.3) 	# add a point for each (x,y) data
+plot.model
+plot.model <- plot.model + geom_abline(intercept = coef(log.model)[1], slope = coef(log.model)[2],color="red")	# add a straight line with intercept and slope from the model.
+plot.model
 
 # "add" stuff. that is 'update()' in R.
 # e.g. "add an age category dummy".
 log.model2 <- update(log.model, . ~ . + educat)	# that means "take model 'log.model', leave the LHS as is (that's the '.'), leave the RHS as is, but add variable 'agecat'".
 summary(log.model2)	# prints a summary of the model.
 # plot with different intercepts
-ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin),color=educat)) + geom_point(alpha=0.6) + geom_abline(intercept = coef(log.model2)[1], slope = coef(log.model2)[2],color="red") + geom_abline(intercept = sum(coef(log.model2)[c(1,3)]), slope = coef(log.model2)[2],color="green") + geom_abline(intercept = sum(coef(log.model2)[c(1,4)]), slope = coef(log.model2)[2],color="blue")
+p2 <- ggplot(data=subset(alldata,wfoodin > 0), aes(x=lndex,y=log(wfoodin),color=educat)) 	# the aes() function with color argument. means: group observations by category of "educat" and show the groups by assigning different colors. this is an additional layer we place on the plot. could also be "size=educat", or "shape=educat" and so on. check out the ggplot2 website for many examples.
+p2 <- p2 + geom_point(alpha=0.6) + geom_abline(intercept = coef(log.model2)[1], slope = coef(log.model2)[2],color="red") 	# add points and the intercept of the base category
+p2  <- p2 + geom_abline(intercept = sum(coef(log.model2)[c(1,3)]), slope = coef(log.model2)[2],color="green")	# add line with intercept for second educat. that's the sum of intercept plus the dummy on educat[16,19)
+p2 <- p2 + geom_abline(intercept = sum(coef(log.model2)[c(1,4)]), slope = coef(log.model2)[2],color="blue")        
+p2
 
 
 log.model3 <- update(log.model2, . ~ . + agecat)	
@@ -126,12 +140,16 @@ summary(log.model2)	# let's see that
 log.model3 <- update(log.model3, . ~ . - educat)	# remove educat 
 summary(log.model3)
 
-
-# TODO iv reg
-
 # add an interaction
 log.model4 <- update(log.model, . ~ . + educat * agecat)	# adds all levels of educat, agecat, and agecat*educat
 summary(log.model4)
+
+# TODO iv reg
+library(AER)	# install.packages('AER') if not yet done
+iv.model <- ivreg( formula = wfoodin ~ factor(numads) + educat + numhhkid + lndex | factor(numads) + educat + numhhkid + hhinc + nrooms, data=alldata)
+summary(iv.model)
+# another ivreg function is explained in this video here. does first stage testing and has nicer syntax http://novicemetrics.blogspot.co.uk/2011/04/video-tutorial-on-iv-regression.html
+
 
 
 # task 6: age profile of nondurable consumption
@@ -139,6 +157,7 @@ summary(log.model4)
 
 p1 <- ggplot(alldata, aes(y=ndex,x=age)) 	# base layer mapping age and nondurable expenditure
 p1 + geom_point( alpha = 0.3 )	# points
+ggplot(subset(alldata,ndex < 2000), aes(y=ndex,x=age)) + geom_point( alpha = 0.3)	# removing outliers, we see some kind of "hump-shape" over lifecycle. but a lot seems to be driven by outliers here. you could interpret this graph as saying that the variance in consumption expenditure increases with age.
 
 qplot(data=alldata, x=ndex, geom = "density")	# short way of wrigin ggplot
 ggplot(alldata,aes(x=ndex,color=educat)) + geom_density()	# by educat
