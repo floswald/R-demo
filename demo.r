@@ -143,7 +143,6 @@ p1 + geom_point( alpha = 0.3 )	# points
 qplot(data=alldata, x=ndex, geom = "density")	# short way of wrigin ggplot
 ggplot(alldata,aes(x=ndex,color=educat)) + geom_density()	# by educat
 ggplot(subset(alldata,ndex < 2000),aes(x=ndex,color=educat)) + geom_density()	# by educat and subset
-stop()
 
 # fit a quantile regression model on a 5-order polynomial of age
 library(quantreg)
@@ -170,4 +169,8 @@ library(reshape)
 melt.preds <- melt(preds, id.vars="age")
 ggplot(data=melt.preds, aes(x=age,y=value,color=variable)) + geom_line()
 
+# the rq() function has a nice standard plot method:
+many.qregs     <- rq(formula =  ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5) , data=alldata, tau=seq(0.05,0.95,by=0.05))
+sum.many.qregs <- summary(many.qregs)
+plot(sum.many.qregs)	# the red line is the corresponding OLS estimate. the plot is over quantiles of the outcome variable. so if the dash-dotted line (the estimate at the x-quantile is very different from the OLS one, this would be interesting. Here OLS seems to do a good job across all quantiles. the rq estimate is significantly different only at the very extreme quantiles, and there might be few observations:
 
