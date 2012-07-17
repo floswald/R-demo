@@ -184,8 +184,17 @@ preds$qr30 <- predict(object = qreg30, newdata = data.frame(age = preds$age))
 preds$qr70 <- predict(object = qreg70, newdata = data.frame(age = preds$age))
 preds$qr90 <- predict(object = qreg90, newdata = data.frame(age = preds$age))
 
+
+# ggplot2 works best with "molten" data, ie a data.frame that you "melt". melting means to heat up stuff until you can take it and cast it into another shape, right?
+# well, that's what this does. type
+head(preds)
+# we have one id column "age", and 6 columns containing different measurements concerning id variable "age", i.e. each column has a different value for any age. ggplot
+# wants a data.frame with at least 3 columns: the id variable (age), the category name (e.g. "ols"), and the correpsonding value. if you have more id variables (suppose "age" and "year" and "region"), you'll have 3 id columns. example.
+
 library(reshape)
 melt.preds <- melt(preds, id.vars="age")
+head(melt.preds,80)
+
 ggplot(data=melt.preds, aes(x=age,y=value,color=variable)) + geom_line()
 
 # the rq() function has a nice standard plot method:
