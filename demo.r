@@ -1,19 +1,217 @@
-# R shot at James Banks' stata demonstration. 
-# you can get the original stata file at https://moodle.ucl.ac.uk/course/view.php?id=8932 (ECONG100 moodle)
+# OuR shot at James Banks' stata demonstration. 
+# Have a look at the original code and file on the G100 moodle web-site.
 
-setwd("~/Dropbox/teaching/UCL-R")	# set the working directory like this. 
+# Welcome To R!
+# (everything after a # character is a comment)
 
-# task 1: read two datasets and merge them
-# --------------------------------------
 
-# read stata data with function read.dta() from library "foreign"
-library(foreign)	# load library "foreign". type help(package="foreign") to see what file formats can be read.
-# a "library" (or a package) is a collection of functions, data, and other things that are not loaded by default. users can write their own libraries. there is a central repository for libraries (CRAN), where you can download libraries that underwent a certain level of quality control. to obtain a package you don't have, let's say ggplt2, just type install.packages("ggplot2")
-fesdat <- read.dta("fesdat2005.dta")	# you can use "<-" or "=" to assign some value to an object. use "<-" if you want to be called a proper useR by your friends. 
+
+
+# assign values to objects with either "<-" or "=". Use "<-".
+
+# different data structures: vectors, matrices, data.frames, lists.
+
+# vectors
+x <- 3.4
+x
+x <- "now x is a character string."
+x
+y <- letters
+length(y)
+dim(y)
+y
+
+# helpers for vector allocation: rep() and seq()
+x <- seq(from=1,to=15,by=3)
+x
+y <- rep(1:3,c(2,3,4))
+y
+z <- rep(c("oh my word"),3)
+z
+length(x)
+dim(x)
+str(x)   # "structure?"
+x <- "who goes there?"
+str(x)
+
+# some vector arithmetic
+
+x <- 1:3
+y <- 4:6
+x + y
+
+x <- 1:4
+x + y  # recycling. all operations +-*/
+
+
+# matrix
+m1 <- matrix(data=1:9,nrow=3,ncol=3,byrow=TRUE)
+m2 <- matrix(data=1:12,nrow=4,ncol=3,byrow=FALSE)
+m1
+m2
+m1[2, ]   # row 2, all columns
+m2[ ,1]   # all rows, column 1
+diag(m2)
+
+# basic matrix arithmetic
+m1 + m2  # error
+m1 * m2  # error. "+", "-" and "*" are element by element
+m2 %*% m1
+m1 %*% t(m2)
+
+# data.frame
+df <- data.frame(cat.1=rep(1:3,each=2),cat.2=1:2,values=rnorm(6))
+df
+# a matrix like object, but more user-friendly. R workhorse.
+# can use the dollar sign to select a column. if column doesn't exist, a new one is created.
+df$alphabet <- letters[1:6]
+subset(df,alphabet=="c")
+df[df$alphabet=="c",]
+df$cat.1
+df$new.col <- df$cat.1 + df$values	# make new column from 2 existing columns
+df
+df$new.col <- NULL	# remove a column by setting to NULL
+df
+
+
+# datasets are usually stored as a data.frames. there are several built-in datasets in base R. for example
+data(LifeCycleSavings)
+LS <- LifeCycleSavings
+head(LS)	# show the first 6 rows of data.frame LifecycleSavings.
+
+# ordering a data.frame
+save.ranking <- order(LS$sr,decreasing=TRUE)	# the function order(x) returns the indices of x in ascending/descending order
+LS[save.ranking,]	# if you plug in an index vector (i.e. save.ranking), the data.frame is reordered in accordance to those indices
+
+# installing packages: "packages" are add on libraries, usually obtained from the CRAN. The great number of available packages is one of the strengths of R. install a package simply by typing, for example
+install.packages("Ecdat")
+# "Ecdat" is a package with many econometrics datasets from prominent textbooks or publications.
+# load a package by calling the library function:
+library(Ecdat)
+help(package="Ecdat")	# get help for the package
+data(Clothing)	# load a dataset from Ecdat
+head(Clothing)
+
+
+# functions
+# R relies extensively on functions. you can look at the source code of a function by typing the name only, as in
+matrix
+
+# of course you can write your own functions, like this:
+myfun <- function(x) {return(x)}
+# this function only returns the argument. you can write any sequence of commands in the curled brackets, separated by a carriage return or a semicolon.
+
+# lists
+l <- list(words=z,mats=list(mat1=m1,mat2=m2),functions=myfun)
+l
+
+# access second element in list
+l[[2]]
+l["matrices"]  # access by name (if names were given)
+l$matrices     # same
+l$matrices$mat1[3, ]   # operate on a certain element
+
+l$new.element <- rnorm(5)    # add a new element: 5 random draws from the standard normal
+l$bool.value <- l$new.element>0   # add a new element: previously drawn numbers positive?
+l
+
+l$new.element <- NULL   # delete an element
+l$bool.value <- NULL
+
+# what is a character, numeric, vector, logical etc?
+
+# your turn
+# make a list "fruit" with two elements: "apples" and "pears". for both apples and pears make up 3 pairs of price/quantity values we might observe on a typical fruit market store them in a data.frame with colum names "price" and "quantity"
+fruit <- list(apples=data.frame(price=c(2,1,1.5),quantity=c(3,2,4)),pears=data.frame(price=c(0.5,1,0.8),quantity=c(1,1,2)))
+fruit
+
+
+# workspace: what objects do we have?
+ls()	# list function
+rm(df,m1,m2)	# remove objects
+rm(list=ls(all=TRUE))	# remove all objects
+ls()
+
+
+# A Sample Econometric Project
+
+
+# First: set the working directory with the setwd() function.
+setwd(dir="~/Dropbox/git/R-demo/")   # the setwd function accepts one argument: "dir", which must be a valid directory, supplied as a character.
+
+# some functions do not require any arguments, either because it doesn't make any sense:
+getwd()
+
+# or because there are default arguments specified:
+matrix()
+
+# if you type "matrix(" or any other function name and an opening bracket in the R console or into RStudio, each will show you the required arguments and any default values. matrix() for example has
+matrix(data=NA,nrow=1,ncol=1,byrow=FALSE,dimnames=NULL)
+# you don't have to understand any of that, except that the function "matrix" accepts 5 arguments, and the default values are set to "NA", 1,1,FALSE and NULL.
+
+# what is a character, numeric, vector, logical etc?
+
+
+
+# R and data
+
+# import data
+
+# read.table()
+# read.csv()
+# read.dta() from library(foreign)
+
+library(foreign)	# you don't have to install foreign, as it's shipped with R.
+fesdat <- read.dta("data/fesdat2005.dta")	
 
 # show first couple of observations
-head(fesdat)	# show first 6 lines (default)
-head(fesdat,10) # show first 10
+head(fesdat)	
+
+summary(fesdat)
+dim(fesdat)
+str(fesdat)
+
+# factors
+str(fesdat$marstat)
+levels(fesdat$marstat)
+fesdat$sex <- factor(fesdat$sex,labels=c("male","female"))	# convert sex into a factor
+head(fesdat)
+summary(fesdat)
+
+# summary statistics and tables
+apply(X=fesdat[,c("numadern","age","foodin")],MARGIN=2,FUN="mean")
+
+# contingency tables of factors
+attach(fesdat)	# now all columns of fesdat are in the search path
+table(sex)
+table(marstat)
+
+# cross tabulation
+table(sex,marstat)
+
+# formula
+f <- ~ sex + marstat
+class(f)  # formula with only RHS "explaining" variables
+xtabs(f)	# same. this is a "formula"
+xtabs(~ marstat + sex + numads)	# three way table
+xtabs(~ sex + age)
+prop.table(xtabs(~ sex + age),margin=1)	# proportion of age by sex
+prop.table(xtabs(~ sex + age),margin=2) # proportion of sex within age
+
+
+detach(fesdat)	# remove fesdat from search path
+
+
+
+
+
+
+
+
+
+
+
+# merge datasets
 
 # read second data set
 incdat <- read.dta("fesinc2005.dta")
