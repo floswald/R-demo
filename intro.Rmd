@@ -1,0 +1,346 @@
+% R Introduction for G100
+% UCL 2013
+% Florian Oswald
+
+# Welcome to R!
+### Agenda
+1. Some basic R. Not (at all) exaustive. 
+    * These slides are designed to get you started. You have to be an exploreR to become a useR.
+    * Have a look at this [self-learn tutorial](http://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf) or many more resources on [my UCL wiki](https://wiki.ucl.ac.uk/display/~uctpfos/R-Resources) for more details
+2. Some quizzes
+3. A sample applied econometric project using the FES (performs the equivalent operations as James Banks' demonstration for Stata)
+4. How to make this set of slides. 
+
+
+# Assigning Values to Objects
+
+- Everything in R (numbers, letters, vectors, functions, plots, formulas, calls,...) is an object
+- assign a value (a number, a matrix, a word, a function, ...) to an object with ```<-``` or ```=``` . Use ```<-``` .
+- R is case sensitive: ```x``` is different from ```X```
+```{r assignx}
+x <- 3.4
+x
+```
+reassigning overwrites the current value:
+```{r assignx2}
+x <- "now x is a character string."
+x
+x <- c(3,5,2.1,1001,4.6)  # c() function combines single values into a vector. 
+x
+```
+
+# The functions ```c()```, ```str(x)``` and ```typeof(x)```
+
+* you assign a value, ```R``` decides how to store it
+* ```typeof(x)``` tells you how x was stored, ```mode(x)``` is similar
+* among possible storage types are
+  * ```logical```: TRUE or FALSE
+  * ```integer```: 1, 2, 3, -10, ...
+  * ```double```: 1.0, pi, -3.2331, ...
+  * ```complex```: 0+0i
+  * ```character```: "hello world"
+* ```c()``` requires values to have the same type (or it coerces into a common type)
+```{r coerce}
+typeof(x)
+y <- letters[10:20]   # letters number 10 trough 20 of the english alphabet
+typeof(y)
+typeof(c(x,y))
+str(c(x,y))   # compact display of structure of an object
+```
+
+# Subsetting a vector
+
+* access the n-th element of ```x``` with ```x[n]```
+* access any tuple of elements by suppling the indices
+```{r subsetx}
+x <- rnorm(n=8) # draw 8 random normal values
+x
+x[3:6] # get elements 3,4,5,6
+x[c(1,5,8)] # elts 1,5 and 8
+x[-c(1,5,8)] # all elts except 1,5 and 8
+```
+
+# Helper Functions for allocation: ```seq()``` and ```rep()```
+
+```{r helpers}
+x <- seq(from=1,to=15,by=3)
+x
+str(x)
+y <- rep(1:3,c(2,3,4))
+y
+z <- rep(c("oh my word"),3)
+z
+```
+
+# Your turn 1
+
+* create a vector x with values 0, 3,  6,  9, 12, 15, 18
+* what is the ```typeof(x)```?
+* create a vector y from the integers 0L, 0L, 7L ("L" means integer)
+* create a vector z from the last 2 elements of x and all of y
+* what's the ```typeof(z)```?
+
+# Your solution 1
+
+```{r ysol1}
+x <- seq(from=0,to=18,by=3)
+typeof(x)
+y <- c(0L,0L,7L)
+y
+z <- c(x[c(6,7)],y)
+typeof(z)
+```
+
+
+# Some Vector Arithmetic
+
+* Operations +-/* are element by element
+```{r arith}
+x <- 1:3
+y <- 4:6
+x + y
+```
+* and vectors are "recycled" if they are not of the same length
+```{r recycle}
+x <- 1:4
+x + y  # recycling the shorter vector y. R gives a warning.
+```
+
+# matrix
+```{r matrix}
+m1 <- matrix(data=1:9,nrow=3,ncol=3,byrow=TRUE)
+m2 <- matrix(data=1:12,nrow=4,ncol=3,byrow=FALSE)
+m1
+m2
+```
+
+# Combining matrices
+
+* similarly to ```c()``` for vectors, we have ```cbind()``` and ```rbind()```
+* column-bind and row-bind
+```{r matrix2}
+rbind(m1,m2) # glue together the last row of of m1 and first of m2
+cbind(m1,t(m2))  # glue last col of m1 and first of t(m2)
+```
+
+
+# Subsetting a matrix
+* get size of matrix with ```dim(m1)```
+* you can select indices of rows and columns. Very similar to matlab.
+* In fact, [if you know subsetting in matlab, you know it in R](http://cran.r-project.org/doc/contrib/Hiebeler-matlabR.pdf)
+```{r submat}
+m1[2, ]   # row 2, all columns
+m2[ ,1]   # all rows, column 1
+m1[c(1,3),c(2,3)] # rows 1,3 and cols 2,3
+```
+* or by name, if those were given:
+```{r submat2}
+colnames(m1) <- c("col1","col2","col3")
+m1[,"col2"]
+colnames(m1) <- NULL # remove colnames
+```
+
+# basic matrix arithmetic
+Again, +-/* are element-wise. Works only on equal sized matrices:
+```{r mat1}
+m1 + m2  
+m1 * m2  
+```
+```%*%``` is the matrix muliplication operation. matrices need to be conformable:
+```{r mat2}
+m2 %*% m1
+m1 %*% t(m2)
+m1 %*% m2
+```
+
+# Your turn 2
+
+* use the ```diag(x=2)``` function to create a 2x2 identity matrix I
+* create a 2x2 matrix with normal random numbers z 
+* use rbind and cbind to create the 6x6 matrix A:
+
+-------  -------  -------
+  z         z       z
+  z         I       z
+  z         z       z
+-------  -------  -------
+
+   
+# Your solution 2
+
+```{r ysol2}
+I <- diag(x=2)
+z <- matrix(data=rnorm(4),nrow=2,ncol=2)
+A <- rbind( cbind(z,z,z), cbind(z,I,z), cbind(z,z,z) )
+A
+```
+
+
+# data.frame
+* A data.frame is a standard dataset
+* each row is an observation, each column is a variable
+* create a data.frame from scratch with ```data.frame()```
+* Notice: all columns need to be of the same length! (a data.frame is a rectangle; it's a spreadsheet!)
+```{r df}
+df <- data.frame(cat.1=rep(1:3,each=2),cat.2=1:2,values=rnorm(6))
+dim(df)
+df
+```
+
+# Subsetting a data.frame
+
+* A data.frame is similar to a matrix. Subsetting is thus similar.
+* but additionally, you can access columns with the ```$``` operator:
+```{r subdf}
+df$values
+```
+* the ```$``` in general accesses elements of "lists" (see below)
+* if an element does not exist, ```$``` adds it:
+```{r subdf2}
+df$new.col <- df$cat.1 + df$values  
+df
+```
+
+# Subsetting a data.frame 2
+
+* convenient: ```subset()```
+```{r subdf3}
+df$alphabet <- letters[1:6] # add elements 1 to 6 of "letters"
+subset(df,alphabet=="c")
+```
+* this is the same as ```df[df$alphabet=="c",]```
+* remove a column with ```NULL```:
+```{r subdf4}
+df$new.col <- NULL  
+df
+```
+
+# Looking at data.frames
+* R stores datasets typically as data.frames
+* special methods to describe those
+```{r data1}
+data(LifeCycleSavings) # data() shows available datasets
+LS <- LifeCycleSavings
+head(LS)	# show the first 6 rows of data.frame LifecycleSavings.
+summary(LS) # function summary()
+```
+
+# ordering a data.frame
+
+* rearrange row indices by a certain criterion
+* ```order()``` and ```sort()```
+* function order(x) returns the indices of x in ascending/descending order
+* plugging in a vector of indices into a matrix/data.frame, reorders the matrix according to those:
+```{r order}
+save.ranking <- order(LS$sr,decreasing=TRUE)	
+head(LS[save.ranking,])
+```
+
+# packages
+* "packages" are add on libraries, i.e. collections of functions, algorithms and datasets
+* The great number of available packages is one of the strengths of R. 
+* install a package simply by typing, for example ```install.packages("Ecdat")```
+* "Ecdat" is a package with many econometrics datasets from prominent textbooks or publications.
+* load a package by calling the library function:
+
+```{r package}
+library(Ecdat)
+data(Clothing)	# load a dataset from Ecdat
+head(Clothing)
+```
+
+* get help for the package via ```help(package="Ecdat")```
+
+# Functions
+
+* R relies heavily on functions
+* in fact, R is composed of functions
+* look at the source code of any R function by typing the name:
+```{r func1}
+matrix
+```
+* you can of course define your own functions.
+* for example, a function to compute the interval that is "spanned" by a vector, i.e. the interval between the min and max of vector:
+```{r func2}
+span <- function(x) {
+  stopifnot(is.numeric(x))  # stops if x is not numeric
+  r <- range(x)   # range() gives the range
+  rval <- abs(r[2]-r[1])  # computes and returns the interval spanned by x
+  return(rval)  # returns result
+  }
+myvec <- rnorm(50)   # draws 50 values from the standard normal pdf
+span(myvec)
+```
+
+# Lists
+
+* can contain data in any "mode": vectors, matrices, data.frames, characters, functions, plots, and more lists
+```{r list1}
+l <- list(words=c("oh my word(s)"),mats=list(mat1=m1,mat2=m2),funs=span)
+l
+```
+
+# Working with Lists
+
+* Access by position number in the list, or by name (if given)
+```{r list2}
+l[[2]][[1]]
+l$mats$mat1
+l$mats$mat1[3, ]   # operate on a certain element
+```
+
+# Adding and removing a new elements from a list
+
+```{r list3}
+l$new.element <- rnorm(5)    # add a new element: 5 random draws from the standard normal
+l$bool.value <- l$new.element>0   # add a new element: previously drawn numbers positive?
+l$new.element <- NULL   # delete an element
+l$bool.value <- NULL
+l$words <- NULL
+l$funs <- NULL
+l
+```
+
+# Your Turn 3
+
+* make a list "fruit" with two elements: "apples" and "pears". 
+* for both apples and pears make up 3 pairs of random price/quantity values, e.g. for apples
+
+> observation | price  |  quantity
+> ------------|--------|---------
+> 1           |  1.3   |     2
+> 2           |  4.8   |     5
+> 3           |  8.9   |     10
+
+* for both apples and pears, store those values (i.e. the above table) in a data.frame with colum names "price" and "quantity"
+
+# Your Solution 3
+
+* I use the uniform random generator ```runif()``` for prices and ```sample()``` for quantities
+
+```{r sol3}
+fruit <- list(apples=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)),pears=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)))
+fruit
+```
+
+# Workspace
+
+* In general, R needs to load an object into memory to be able to work with it
+* the function ```ls()``` shows the content of your workspace, or your current "search path"
+```{r ls}
+ls()  
+rm(df,m1,m2,"%ni%",Clothing,fruit,l)	# remove objects
+ls()
+rm(list=ls(all=TRUE))	# remove all objects
+ls()
+```
+
+
+# How to make this set of slides
+
+* Use [RStudio](http://www.rstudio.org) to author an R markdown file
+* click a button in RStudio to knit an HTML document
+* this uses the amazing [knitr package](http://yihui.name/knitr/) to "knit" (evaluated or not) R code into text documents. 
+* finally use pandoc to convert to HTML5 slides: ```pandoc -s -S -t slidy --mathjax --self-contained intro.md -o intro.html```
+* Get the R markdown source code of this presentation on [github](https://github.com/floswald/R-demo)
+* More info at [MAGES blog](http://lamages.blogspot.co.uk/2012/05/interactive-html-presentation-with-r.html)
