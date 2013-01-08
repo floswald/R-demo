@@ -3,10 +3,12 @@
 % Florian Oswald
 
 # Welcome to R!
-### Agenda
+## Agenda
 1. Some basic R. Not (at all) exaustive. 
     * These slides are designed to get you started. You have to be an exploreR to become a useR.
-    * Have a look at this [self-learn tutorial](http://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf) or many more resources on [my UCL wiki](https://wiki.ucl.ac.uk/display/~uctpfos/R-Resources) for more details
+    * Try this [online R challenge at codeschool](http://tryr.codeschool.com/levels/1/challenges/1). Codeschool provides excellent tryouts IN YOUR BROWSER (you don't need to install anything.
+    * Have a look at this [self-learn tutorial](http://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf) or many more resources on [my UCL wiki](https://wiki.ucl.ac.uk/display/~uctpfos/R-Resources) for more details 
+    * Check out this excellent set of [R introduction slides courtesy of UCLA Statistical Consulting Group](http://statistics.ats.ucla.edu/stat/r/seminars/intro.htm)
 2. Some quizzes
 3. A sample applied econometric project using the FES (performs the equivalent operations as James Banks' demonstration for Stata)
 4. How to make this set of slides. 
@@ -156,7 +158,7 @@ m1 %*% m2
 # Your turn 2
 
 * use the ```diag(x=2)``` function to create a 2x2 identity matrix I
-* create a 2x2 matrix with normal random numbers z 
+* create a 2x2 matrix with normal random numbers z. type ```help(rnorm)``` or ```help(matrix)``` if needed.
 * use rbind and cbind to create the 6x6 matrix A:
 
 -------  -------  -------
@@ -178,6 +180,7 @@ A
 
 # data.frame
 * A data.frame is a standard dataset
+* very similar to ```matrix```
 * each row is an observation, each column is a variable
 * create a data.frame from scratch with ```data.frame()```
 * Notice: all columns need to be of the same length! (a data.frame is a rectangle; it's a spreadsheet!)
@@ -201,25 +204,45 @@ df$new.col <- df$cat.1 + df$values
 df
 ```
 
-# Subsetting a data.frame 2
+# ```subset()``` 1
 
-* convenient: ```subset()```
+* get a subset of observations conditional on values of a variable
 ```{r subdf3}
-df$alphabet <- letters[1:6] # add elements 1 to 6 of "letters"
-subset(df,alphabet=="c")
+subset(df,cat.1==1) # select all obs were cat.1 equals 1
 ```
-* this is the same as ```df[df$alphabet=="c",]```
-* remove a column with ```NULL```:
+* this is the same as ```df[df$cat.1==1,]```
+
+# ```subset()``` 2
+
+* get a subset of variables 
 ```{r subdf4}
+subset(df,select = c(cat.2, values)) # selects columns "cat.2" and "values"
+```
+
+# Removing columns
+
+remove a column with ```NULL```:
+```{r subdf5}
 df$new.col <- NULL  
 df
 ```
 
+# Appending Data: rbind
+
+* very similar to ```rbind``` for ```matrix```
+* If you have two data.frames with equally named columns (e.g. two editions of the same dataset), just glue together with ```rbind```
+
+```{r subdf6}
+df2 <- df # create df2 as an exact copy of df
+df2$values <- runif(n=nrow(df2)) # but change the entries for "values"
+rbind(df,df2) # join them row-wise
+```
+
 # Looking at data.frames
 * R stores datasets typically as data.frames
-* special methods to describe those
+* special "methods"" to describe those (a method is a function that does things differently depending on the object you give it)
 ```{r data1}
-data(LifeCycleSavings) # data() shows available datasets
+data(LifeCycleSavings) # data() shows available built-in datasets
 LS <- LifeCycleSavings
 head(LS)	# show the first 6 rows of data.frame LifecycleSavings.
 summary(LS) # function summary()
@@ -248,7 +271,6 @@ library(Ecdat)
 data(Clothing)	# load a dataset from Ecdat
 head(Clothing)
 ```
-
 * get help for the package via ```help(package="Ecdat")```
 
 # Functions
@@ -304,23 +326,35 @@ l
 # Your Turn 3
 
 * make a list "fruit" with two elements: "apples" and "pears". 
-* for both apples and pears make up 3 pairs of random price/quantity values, e.g. for apples
+* for both apples and pears make up 3 pairs of random price/quantity values, e.g. for apples    
 
-> observation | price  |  quantity
-> ------------|--------|---------
-> 1           |  1.3   |     2
-> 2           |  4.8   |     5
-> 3           |  8.9   |     10
+ observation    price     quantity
+-------------  --------  ----------
+    1             1.3        2
+    2             4.8        5
+    3             8.9        10
 
 * for both apples and pears, store those values (i.e. the above table) in a data.frame with colum names "price" and "quantity"
+* In other words, produce the following list. (make up your own numbers)
+```{r sol3,echo=FALSE}
+fruit <- list(apples=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)),pears=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)))
+fruit
+```
 
 # Your Solution 3
 
-* I use the uniform random generator ```runif()``` for prices and ```sample()``` for quantities
+* you can input the values by hand, for example 
+* ```apples <- data.frame(price=c(1.1,2.9,1.6),quantity=c(2,3,1))```
+* I used the uniform random generator ```runif()``` for prices and ```sample()``` for quantities
 
-```{r sol3}
+```{r sol4}
+apples <- data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3))
+pears <- data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3))
+fruit <- list()
+fruit$apples <- apples
+fruit$pears <- pears
+# or all in one line:
 fruit <- list(apples=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)),pears=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)))
-fruit
 ```
 
 # Workspace
@@ -335,12 +369,301 @@ rm(list=ls(all=TRUE))	# remove all objects
 ls()
 ```
 
+# A Sample Applied Econometric Project
+
+## Food and Expenditure Survey (FES)
+
+* [click here to download the data from moodle in a zip](https://moodle.ucl.ac.uk/mod/resource/view.php?id=1145211)
+* zip contains 4 files, 2 in .csv and 2 in .dta format
+* each format has one data file ("fesdat") and one file on income ("fesinc")
+
+## Agenda
+
+1. how to read different data
+2. how to merge data
+3. how to analyse data
+    * with summary statistics (numerical variables)
+    * in tables (categorical vars)
+    * graphically
+    * with statistical models
+4. how to report results
+
+# Reading Data Files
+
+* Read data with with family of ```read.xxx()``` functions: 
+  * ```read.csv()```: comma separated values
+  * ```read.dta()```: stata format
+  * ```read.table()```: generic text/table reader
+* ```library(foreign)``` contains many useful functions to read all sorts of foreign data formats
+* ```library(xlsx)``` is useful to read .xls data
+
+# Read FES
+
+* let's read both .csv and .dta formats just to demonstrate:
+```{r demo1}
+setwd(dir="~/Dropbox/git/R-demo/")   # set working directory
+fesdat.csv <- read.csv(file="data/fesdat.csv") # read the data in csv format. Note that "file" could also be a URL
+fesinc.csv <- read.csv(file="data/fesinc.csv") # read the income data in csv format
+library(foreign)  # load foreign to read stata data
+fesdat.dta <- read.dta(file="data/fesdat2005.dta") 
+fesinc.dta <- read.dta(file="data/fesinc2005.dta") 
+head(fesdat.csv)
+head(fesdat.dta)
+```
+
+# Summary
+
+```{r demo2}
+dat <- fesdat.dta # let's rename this to something shorter
+inc <- fesinc.dta
+summary(dat) 
+dat$year <- NULL # we've only got one year, so useless info
+```
+
+# Factors
+* Factors are categorical variables
+```{r demo3}
+str(dat$marstat) # marstat is already a factor
+levels(dat$marstat)
+dat$sex <- factor(dat$sex,labels=c("male","female"))  # convert sex into a factor
+summary(subset(dat, select = c(sex,marstat)))
+```
+
+# Contingency Tables of Factors
+
+```{r demo4}
+attach(dat) # attach(x) makes all cols of x visible on the search path
+table(sex) # otherwise I'd have to type dat$sex here
+table(marstat,sex)
+```
+
+# More complicated tables: ```xtabs()```
+
+* takes a ```formula``` as an argument
+* typical formula: ```y ~ x + z``` means "y is explained by x and z"
+
+```{r demo5}
+f <- ~ sex + kids0
+class(f)  # formula with only RHS "explaining" variables
+xtabs(f)  
+xtabs(~ kids0 + sex + nrooms)	# three way table
+prop.table(xtabs(~ sex + kids0),margin=1)	# proportion of kids0 by sex
+prop.table(xtabs(~ sex + kids0),margin=2) # proportion of kids0 within age
+detach(dat) # remove dat from search path
+```
+
+# Merge Data
+
+* Both `dat` and `inc` include a unique hh identifier `hhref`
+* use `merge()`
+```{r demo6}
+dat.inc <- merge(dat,inc,by=c("hhref"))  # if multiple keys: by=c("hhref","year")
+head(dat.inc) # note new column hhinc
+```
+
+# Summaries by groups of Variables: ```library(plyr)```
+* Often we want summary statistics by groups of variables
+* ```tapply()```, ```by()``` and ```aggregate()``` are base R possibilities
+* we'll show ```library(plyr)``` here
+* [click for the amazing tutorial of plyr by Hadley Wickham](http://plyr.had.co.nz/09-user/)
+
+# `ddply{plyr}`
+
+* Split data frame, apply function, and return results in a data frame.
+```{r demo7,message=FALSE}
+library(plyr)
+ddply(.data=dat.inc,.variables="sex",.fun=summarise,inc=mean(hhinc))  # mean income by sex?
+ddply(dat.inc,c("sex","numads"),summarise,alc=mean(alc),foodin=mean(foodin),foodout=mean(foodout)) 
+```
+
+# `ddply{plyr}` 2
+
+* `summarise` can be many things, not just `mean()`
+* you can supply any function you want
+* check out Hadley's tutorial. ```ddply``` is very powerful.
+```{r demo8}
+ddply(dat.inc,"sex",summarise,age.range=median(age),car.rooms=max(ncars/nrooms)) 
+ddply(subset(dat.inc,numhhkid > 1),"ncars",function(x) data.frame(dur.inc=mean(x$dur/x$hhinc),nondur.inc=mean(x$nondur/x$hhinc)))  # instead of summarise(), supply an "anonymous" function
+```
+
+# Graphics and R
+
+* production of high-quality graphics is another strength of R
+* base R is a good start. Many class-specific plotting methods.
+* more functionality from other packages:
+  * `library(ggplot2)`
+  * `library(lattice)`
+* one could easily fill 2 hours talking about ggplot alone. Scratching the surface here.
+
+# Base R plots
+
+```{r demo9}
+plot(y=log(dat.inc$ndex),x=log(dat.inc$hhinc)) # many options. see ?plot and ?par
+plot(factor(dat.inc$ncars)) # plot depends on data types
+```
+
+# Plots with ggplot
+
+* ggplots are based on the Grammar of Graphics
+* [click here for help, examples and tutorials at http://ggplot2.org/](http://ggplot2.org/)
+* a plot is defined by a set of data that is mapped onto a picture - in many complicated ways, if you so desire
+* the mappings are called ```aes()``` thetics. For example ```aes(x=var1,y=var2)```
+* the way they appear in the picture are called ```geom``` etrics
+* let's plot log non-durable expenditure against log household income in a scatter plot
+```{r demo10}
+library(ggplot2)  
+p <- ggplot(data=dat.inc,aes(x=log(hhinc),y=log(ndex)))	# not a plot yet: misses a geom
+p + geom_point() # now that's a plot
+```
+
+# ggplot 2
+
+```{r demo11,cache=TRUE}
+dat <- subset(dat.inc, hhinc>0 & ndex > 0) # get rid of some negative values
+# add another layer: color points by marstat, and decrease opacity to 0.4
+p <- ggplot(data=dat,aes(x=log(hhinc),y=log(ndex)))  # not a plot yet: misses a geom
+p + geom_point(aes(color=marstat), alpha=0.4) 
+p + geom_point() + facet_wrap( ~ sex) # split plot by factor sex
+```
+
+# Create Bins: ```cut()``` an interval
+
+* suppose instead of ```age = {17,18,19,...}``` we want categories of age
+* base R has ```cut()```
+* ggplot2 has derived ```cut_interval()```, bit more intuitive
+
+```{r demo12}
+dat$age.cat <- cut_interval(dat$age,length=5) # add col with age category
+dat$ced.cat <- cut_interval(dat$ageced,length=5) # add col with age at educ completion category
+str(dat$age.cat) # is a factor?
+table(dat$age.cat)
+table(dat$ced.cat)
+```
+
+# More ggplots
+
+```{r demo13,cache=TRUE}
+ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=age.cat),alpha=0.4)
+ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_smooth(aes(color=age.cat),method="lm",se=FALSE) 
+sdat <- subset(dat,ced.cat %in% c("(10,15]","(15,20]","(20,25]") & log(hhinc) > 3& log(hhinc) < 9) # select a subset of ced
+ggplot(data=sdat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=ced.cat),alpha=0.3) + geom_smooth(aes(color=ced.cat),se=FALSE,size=1)  
+```
+
+# Regression Models
+
+* linear models: ```lm()```
+* generalized linear models (probit, logit et al): ```glm```
+* loads of packages on [CRAN](http://cran.r-project.org/)
+* specify a model with a formula
+```{r demo14}
+mod.1 <- lm(formula= lndex ~ log(hhinc),data=dat)
+summary(mod.1)
+```
+
+# ```update()``` a model
+
+* easy to iterate on models
+```{r demo15}
+mod.2 <- update(mod.1, . ~ . -1 )  # leave formula as is, but substract the intercept
+mod.3 <- update(mod.1, . ~ . + age + I(age^2) )  # add age and age squared
+coef(summary(mod.2)) # use coef() function to extract coefs only
+coef(summary(mod.3)) 
+```
+
+# ```predict()``` data from a model
+
+* use the ```predict()``` function 
+* say we want to predict values of lndex from ```mod.3```
+```{r demo16}
+newdat <- expand.grid(hhinc=c(200,300),age=c(20,50,80))
+cbind(newdat,predict(mod.3,newdat))
+```
+
+# ```ggplot``` model coeficients
+
+* ```abline()``` is a convenient ```geom``` for this
+* works well for single explanatory variable
+```{r demo17,cache=TRUE}
+p <- ggplot(dat,aes(x=log(hhinc),y=lndex))
+p + geom_point() + geom_abline(intercept=coef(mod.1)[1],slope=coef(mod.1)[2],col="red")
+```
+
+# ```update()``` a model 2: add a dummy variable
+
+* let's add the number of rooms as a dummy variable `d`
+* i.e. we want d1=1 if nrooms==1, d1=0 else; d2=1 iff nrooms==2 etc
+* R does that for you (you don't want to create all those d's)
+```{r demo18}
+mod.4 <- update(mod.3, . ~ . + factor(nrooms) )  
+summary(mod.4)
+```
+
+# Hyothesis Testing, IV models
+
+* check out ```library(car)``` and ```library(AER)```
+* convenient functions for all applied econometrics tasks
+
+# Create an Age Profile for consumption
+
+* How does the distribution of non-durable expenditure vary wity age?
+* How to model this in a regression model?
+```{r demo19,cache=TRUE}
+ggplot(subset(dat,ndex < 1000), aes(x=ndex)) + geom_density(aes(color=age.cat))
+```
+
+# Age Profile: Quantile Regression
+
+```{r demo20,message=FALSE}
+library(quantreg)
+qreg50 <- rq(formula= ndex ~ age,data=dat,tau=0.5) # median regression
+qreg <- rq(formula= ndex ~ age,data=dat,tau=seq(0.05,0.95,le=10)) # quantile reg at several quantiles
+plot(summary(qreg)) # very nice plotting method
+```
+
+# Age Profile: Compare OLS and Quantile Reg
+
+* compare the Conditional Expectation (the OLS estimate) with the conditional quantile function
+* fit a 5-th order polynomial in age
+```{r demo21}
+form <- ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5)
+lin.mod <- lm(formula = form, data=dat)
+taus <- seq(0.1,0.9,le=9) # desired quantiles
+qr.mod <- rq(formula= form,data=dat,tau=taus)
+ages <- sort(unique(dat$age)) # vector of ages in data
+# create data.frame with cols "age", and a prediction for each model
+preds <- data.frame(age = ages, OLS= predict(lin.mod, newdata = data.frame(age = ages)))
+# add qreg predictions
+preds <- cbind(preds, predict(qr.mod,data.frame(age=ages)))
+head(preds)
+```
+
+# Plot OLS vs Quantile Reg Age Profiles
+
+* ggplot works best with long data. 
+* need to ```reshape``` preds into long
+```{r demo22,cache=TRUE,message=FALSE}
+library(reshape)
+mpreds <- melt(preds,id.vars="age") # now the data is long
+head(mpreds)
+ggplot(subset(mpreds,age>22),aes(x=age,y=value,color=variable)) + geom_line() + scale_y_continuous(name="predicted nondurable expenditure")
+```
+
+# R and Time Series
+
+* R has strong time series capabilities
+* check out 
+  * ```help(ts)```
+  * ```library(zoo)```
+  * ```library(dynlm)```
+
+
+
 
 # How to make this set of slides
 
 * Use [RStudio](http://www.rstudio.org) to author an R markdown file
 * click a button in RStudio to knit an HTML document
 * this uses the amazing [knitr package](http://yihui.name/knitr/) to "knit" (evaluated or not) R code into text documents. 
-* finally use pandoc to convert to HTML5 slides: ```pandoc -s -S -t slidy --mathjax --self-contained intro.md -o intro.html```
+* finally use pandoc to convert to HTML5 slides: ```pandoc -s -S -t slidy --mathjax intro.md -o intro.html```
 * Get the R markdown source code of this presentation on [github](https://github.com/floswald/R-demo)
 * More info at [MAGES blog](http://lamages.blogspot.co.uk/2012/05/interactive-html-presentation-with-r.html)
