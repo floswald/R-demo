@@ -282,7 +282,7 @@ ddply(alldata,c("sex","marstat"),summarise, inc=mean(hhinc), alc=mean(alc))
 plot(x=alldata$wfoodin, y=alldata$ndex)	# plot() is the R base package plotting function. it can be useful at times, because easy. but also a bit limited.
 
 library(ggplot2)	# therefore Hadley Wickham gave us ggplot2.
-p <- ggplot(data=alldata,aes(x=wfoodin,y=ndex))	# aes() is the "aestethic" mapping of data onto a graph. we map wfoodin as x and ndex as y
+p <- ggplot(data=alldata,aes(x=wfoodin,y=hhinc))	# aes() is the "aestethic" mapping of data onto a graph. we map wfoodin as x and ndex as y
 p + geom_point()	# now we choose a way to visualize this mapping. points.
 p + geom_point() + scale_y_log10(name="log nondurable exp")	# place a log scale on y
 p + geom_point(alpha=0.3) + scale_y_log10(name="log nondurable exp")	# 
