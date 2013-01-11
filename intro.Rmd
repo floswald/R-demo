@@ -24,7 +24,7 @@
 
 # The R Learning Curve
 >* is steep.
->* However, support is outstanding.
+>* However, community support is outstanding.
 	* R has a very large and active user community
 	* googling your question almost always returns something useful
 	* get familiar with [stackoverflow](http://www.stackoverflow.com)
@@ -33,6 +33,11 @@
 	* [R for Matlab Users](http://cran.r-project.org/doc/contrib/Hiebeler-matlabR.pdf)
 >* So: Let's get started.
 
+# Getting `help()`
+
+* if you want help about a function, type `help(fname)`
+* if you don't know which function you are looking for, try `??fname``
+* go to the [R Site Search](http://finzi.psych.upenn.edu/search.html)
 
 # Assigning Values to Objects
 
@@ -456,6 +461,9 @@ ls()
     * with statistical models
 4. how to report results
 
+# R does a lot of Econometrics 
+* [click here to get an overview of the Econometrics capabilities of R.](http://cran.stat.ucla.edu/web/views/Econometrics.html)
+
 # Reading Data Files
 
 * Read data with with family of ```read.xxx()``` functions: 
@@ -755,7 +763,7 @@ ggplot(subset(dat,ndex < 1000), aes(x=ndex)) + geom_density(aes(color=age.cat))
 
 # Age Profile: Quantile Regression
 
-```{r qr1,message=FALSE,cache=TRUE}
+```{r qr1t,cache=TRUE}
 library(quantreg)
 qreg50 <- rq(formula= ndex ~ age,data=dat,tau=0.5) # median regression
 qreg <- rq(formula= ndex ~ age,data=dat,tau=seq(0.05,0.95,le=10)) # quantile reg at several quantiles
@@ -794,7 +802,7 @@ ggplot(subset(mpreds,age>22),aes(x=age,y=value,color=variable)) + geom_line() + 
 
 * R has strong time series capabilities
 * check out 
-    * ```help(ts)```
+    * [CRAN Time Series Task View: General Overview](http://cran.stat.ucla.edu/web/views/TimeSeries.html)
     * ```library(zoo)``` for general ordered obs
     * ```library(dynlm)``` for dynamic regressions
 ```{r}
