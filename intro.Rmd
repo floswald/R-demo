@@ -4,14 +4,25 @@
 
 # Welcome to R!
 ## Agenda
-1. Some basic R. Not (at all) exaustive. 
+>1. Some basic R. Not (at all) exaustive. 
     * These slides are designed to get you started. You have to be an exploreR to become a useR.
     * Try this [online R challenge at codeschool](http://tryr.codeschool.com/levels/1/challenges/1). Codeschool provides excellent tryouts IN YOUR BROWSER (you don't need to install anything.
     * Have a look at this [self-learn tutorial](http://www.nceas.ucsb.edu/files/scicomp/Dloads/RProgramming/BestFirstRTutorial.pdf) or many more resources on [my UCL wiki](https://wiki.ucl.ac.uk/display/~uctpfos/R-Resources) for more details 
     * Check out this excellent set of [R introduction slides courtesy of UCLA Statistical Consulting Group](http://statistics.ats.ucla.edu/stat/r/seminars/intro.htm)
-2. Some quizzes
-3. A sample applied econometric project using the FES (performs the equivalent operations as James Banks' demonstration for Stata)
-4. How to make this set of slides. 
+>2. Some quizzes
+>3. A sample applied econometric project using the FES (performs the equivalent operations as James Banks' demonstration for Stata)
+>4. How to make this set of slides. 
+
+# The R Learning Curve
+>* is steep.
+>* However, support is outstanding.
+	* R has a very large and active user community
+	* googling your question almost always returns something useful
+	* get familiar with [stackoverflow](http://www.stackoverflow.com)
+>* If you know other software, switching is easy:
+	* [R for Stata Users](http://dss.princeton.edu/training/RStata.pdf)
+	* [R for Matlab Users](http://cran.r-project.org/doc/contrib/Hiebeler-matlabR.pdf)
+>* So: Let's get started.
 
 
 # Assigning Values to Objects
@@ -24,7 +35,7 @@ x <- 3.4
 x
 ```
 reassigning overwrites the current value:
-```{r assignx2}
+```{r}
 x <- "now x is a character string."
 x
 x <- c(3,5,2.1,1001,4.6)  # c() function combines single values into a vector. 
@@ -39,6 +50,9 @@ x
   * ```logical```: TRUE or FALSE
   * ```integer```: 1, 2, 3, -10, ...
   * ```double```: 1.0, pi, -3.2331, ...
+  * ```factor```: categorial variables
+    * dummy vars: (0,1) labelled `male`,`female`
+	* categories: (1,2,3) labelled `(2,5],(5,7],(7,10]`	
   * ```complex```: 0+0i
   * ```character```: "hello world"
 * ```c()``` requires values to have the same type (or it coerces into a common type)
@@ -65,7 +79,7 @@ x[-c(1,5,8)] # all elts except 1,5 and 8
 # Helper Functions for allocation: ```seq()``` and ```rep()```
 
 ```{r helpers}
-x <- seq(from=1,to=15,by=3)
+x <- seq(from=1,to=15,by=3) # also "length" instead of "by"
 x
 str(x)
 y <- rep(1:3,c(2,3,4))
@@ -78,7 +92,7 @@ z
 
 * create a vector x with values 0, 3,  6,  9, 12, 15, 18
 * what is the ```typeof(x)```?
-* create a vector y from the integers 0L, 0L, 7L ("L" means integer)
+* create a vector y containing the words {"are","my","favourite","numbers"}
 * create a vector z from the last 2 elements of x and all of y
 * what's the ```typeof(z)```?
 
@@ -86,10 +100,11 @@ z
 
 ```{r ysol1}
 x <- seq(from=0,to=18,by=3)
+x
 typeof(x)
-y <- c(0L,0L,7L)
-y
-z <- c(x[c(6,7)],y)
+y <- c("are","my","favourite","numbers")
+z <- c(x[c(6,7)],y)	# R "coerces" x and y to a common type. here: char
+z
 typeof(z)
 ```
 
@@ -145,8 +160,8 @@ colnames(m1) <- NULL # remove colnames
 # basic matrix arithmetic
 Again, +-/* are element-wise. Works only on equal sized matrices:
 ```{r mat1}
-m1 + m2  
-m1 * m2  
+m1 + m2  # error
+m1 * m2  # error
 ```
 ```%*%``` is the matrix muliplication operation. matrices need to be conformable:
 ```{r mat2}
@@ -234,7 +249,7 @@ df
 
 ```{r subdf6}
 df2 <- df # create df2 as an exact copy of df
-df2$values <- runif(n=nrow(df2)) # but change the entries for "values"
+df2$values <- 1:nrow(df)  # but change the entries for 'values'
 rbind(df,df2) # join them row-wise
 ```
 
@@ -262,16 +277,15 @@ head(LS[save.ranking,])
 # packages
 * "packages" are add on libraries, i.e. collections of functions, algorithms and datasets
 * The great number of available packages is one of the strengths of R. 
-* install a package simply by typing, for example ```install.packages("Ecdat")```
-* "Ecdat" is a package with many econometrics datasets from prominent textbooks or publications.
+* install a package simply by typing, for example ```install.packages("ggplot2")```
+* `ggplot2` is a widely used package with plotting functions. 
 * load a package by calling the library function:
 
 ```{r package}
-library(Ecdat)
-data(Clothing)	# load a dataset from Ecdat
-head(Clothing)
+library(ggplot2) # now the content of ggplot2 (functions, data, etc) are "visible"
+cut_interval     # for example, here's the code to function "cut_interval"
 ```
-* get help for the package via ```help(package="Ecdat")```
+* get help for a package via ```help(package="package-name")```
 
 # Functions
 
@@ -304,11 +318,14 @@ l
 
 # Working with Lists
 
-* Access by position number in the list, or by name (if given)
+* Access a list element by position number in the list, or by name (if given)
+* ```[["x"]]``` gives you element "x" as a standalone object
+* ```["x"]``` gives you element "x" as a sublist with element "x"
 ```{r list2}
-l[[2]][[1]]
-l$mats$mat1
-l$mats$mat1[3, ]   # operate on a certain element
+l[[2]]  # second list element: "mats"
+l$mats$mat1 	# of that element, the first element
+str(l[[1]])	 # extract first element completely
+str(l[1])	 # extract first element as member of sublist
 ```
 
 # Adding and removing a new elements from a list
@@ -357,13 +374,55 @@ fruit$pears <- pears
 fruit <- list(apples=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)),pears=data.frame(price=runif(min=0,max=4,n=3),quantity=sample(1:4,size=3)))
 ```
 
-# Workspace
+# Factors
+* Factors are categorical variables
+* a number is given a character label
+* R has plotting and tabulating methods for factors
+* also nice useage in regressions
+```{r}
+new.fac <- factor(x=c(1,1,2,5,5,5),labels=c("apples","pears","shoes"))
+new.fac
+table(new.fac)
+plot(new.fac)
+```
 
+# Contingency Tables of multiple Factors
+* `table()` can count cases of factors against each other
+```{r}
+UCB <- as.data.frame(UCBAdmissions) 	# load built in data
+head(UCB)
+summary(UCB)	# notice how summary treats factors and numerics
+table(UCB$Admit,UCB$Dept) 	# table admit vs Dept?
+```
+* But is that what we want here?
+
+# Contingency tables 2
+* No! We want to know "Freq" by those categories.
+* In R-speak, what is the relationship ```Freq ~ factors```?
+* `xtabs()`
+  * takes a ```formula``` as an argument
+  * typical formula: ```y ~ x + z``` means "y is explained by x and z"
+```{r}
+xtabs(Freq ~ Admit + Dept,data=UCB)	# Freq is explained by Admit and Gender
+xtabs(Freq ~ Admit + Gender,data=UCB)
+```
+
+# Your turn 4
+* create a table that shows the number of admissions/rejections by gender AND department.
+
+# Your Solution 4
+```{r}
+xtabs(Freq ~ Admit + Gender + Dept,data=UCB)
+```
+
+
+# Workspace
 * In general, R needs to load an object into memory to be able to work with it
+* This can be a problem with large data sets
 * the function ```ls()``` shows the content of your workspace, or your current "search path"
 ```{r ls}
 ls()  
-rm(df,m1,m2,"%ni%",Clothing,fruit,l)	# remove objects
+rm(df,m1,m2,"%ni%",fruit,l)	# remove objects
 ls()
 rm(list=ls(all=TRUE))	# remove all objects
 ls()
@@ -400,7 +459,7 @@ ls()
 # Read FES
 
 * let's read both .csv and .dta formats just to demonstrate:
-```{r demo1}
+```{r}
 setwd(dir="~/Dropbox/git/R-demo/")   # set working directory
 fesdat.csv <- read.csv(file="data/fesdat.csv") # read the data in csv format. Note that "file" could also be a URL
 fesinc.csv <- read.csv(file="data/fesinc.csv") # read the income data in csv format
@@ -413,7 +472,7 @@ head(fesdat.dta)
 
 # Summary
 
-```{r demo2}
+```{r}
 dat <- fesdat.dta # let's rename this to something shorter
 inc <- fesinc.dta
 summary(dat) 
@@ -421,8 +480,7 @@ dat$year <- NULL # we've only got one year, so useless info
 ```
 
 # Factors
-* Factors are categorical variables
-```{r demo3}
+```{r}
 str(dat$marstat) # marstat is already a factor
 levels(dat$marstat)
 dat$sex <- factor(dat$sex,labels=c("male","female"))  # convert sex into a factor
@@ -431,7 +489,7 @@ summary(subset(dat, select = c(sex,marstat)))
 
 # Contingency Tables of Factors
 
-```{r demo4}
+```{r}
 attach(dat) # attach(x) makes all cols of x visible on the search path
 table(sex) # otherwise I'd have to type dat$sex here
 table(marstat,sex)
@@ -439,12 +497,9 @@ table(marstat,sex)
 
 # More complicated tables: ```xtabs()```
 
-* takes a ```formula``` as an argument
-* typical formula: ```y ~ x + z``` means "y is explained by x and z"
-
-```{r demo5}
+```{r}
 f <- ~ sex + kids0
-class(f)  # formula with only RHS "explaining" variables
+class(f)  # formula with only RHS "explaining" variables: just get a count
 xtabs(f)  
 xtabs(~ kids0 + sex + nrooms)	# three way table
 prop.table(xtabs(~ sex + kids0),margin=1)	# proportion of kids0 by sex
@@ -456,21 +511,105 @@ detach(dat) # remove dat from search path
 
 * Both `dat` and `inc` include a unique hh identifier `hhref`
 * use `merge()`
-```{r demo6}
+```{r}
 dat.inc <- merge(dat,inc,by=c("hhref"))  # if multiple keys: by=c("hhref","year")
 head(dat.inc) # note new column hhinc
 ```
+
+
+
+# Create Bins: ```cut()``` an interval
+
+* suppose instead of ```age = {17,18,19,...}``` we want categories of age
+* base R has ```cut()```
+* ggplot2 has derived ```cut_interval()```, bit more intuitive
+
+```{r,message=FALSE}
+dat.inc$age.cat <- cut_interval(dat.inc$age,length=5) # add col with age category
+dat.inc$ced.cat <- cut_interval(dat.inc$ageced,length=5) # add col with age at educ completion category
+str(dat.inc$age.cat) # is a factor?
+table(dat.inc$age.cat)
+plot(dat.inc$age.cat)
+table(dat.inc$ced.cat)
+```
+
+# Create Bins 2: decile of income?
+
+* Suppose we want to put people into their respective income decile
+```{r}
+inc.dec <- quantile(dat.inc$hhinc,prob=seq(0,1,length=11)) # income deciles
+inc.dec
+dat.inc$inc.cat <- cut(dat.inc$hhinc,inc.dec,labels=FALSE)
+head(dat.inc[,c("hhinc","inc.cat")])	# look at columns hhinc and inc.cat
+table(dat.inc$inc.cat)
+```
+
+
+
+
+
 
 # Summaries by groups of Variables: ```library(plyr)```
 * Often we want summary statistics by groups of variables
 * ```tapply()```, ```by()``` and ```aggregate()``` are base R possibilities
 * we'll show ```library(plyr)``` here
 * [click for the amazing tutorial of plyr by Hadley Wickham](http://plyr.had.co.nz/09-user/)
+* workhorse functions are 
+  * ```tranform()```: transform a data.frame, (you get a df of same or bigger size)
+  * ```summarise()```: summarises a data.frame (you get a df that is smaller)
+  
+# ```summarise()``` and ```transform()```
+* use our FES data in ```dat.inc```.
+* functions work on an entire data.frame
+```{r demoplyr,message=FALSE}
+library(plyr)
+summarise(dat.inc,mhhinc = mean(hhinc), vhhinc = sd(hhinc), mnumads=mean(numads)) # summarise over an entire data.frame
+head(transform(dat.inc,inc.rank = rank(hhinc)),10) # add "income rank". head(...,10) to see first 10 lines only
+```
 
-# `ddply{plyr}`
+# ```summarise()``` and ```transform()``` by groups?
+
+1. how can we get the income rank for all categories of, say, ```marstat```?
+2. can we express everybody's income as a percentage of the highest income in each category of ```marstat```?
+3. what is the median ratio of durable to nondurable expenditure by number of rooms? 
+4. what is it by incoem decile?
+5. what is it by both?
+
+# ```transform()``` by groups: ```ddply()```
+
+1. add income rank for each household for all categories of ```marstat``` to ```dat```
+```{r}
+head(ddply(.data=dat.inc,.variables="marstat",.fun=transform, rank.marstat = rank(hhinc)),10)
+```
+2. express everybody's income as a percentage of the highest income in each category of ```marstat```
+```{r}
+head(ddply(dat.inc,"marstat",transform, perc.of.max = hhinc/max(hhinc)),10)
+```
+
+# ```summarise()``` by groups
+
+3. median ratio of durable to nondurable expenditure by number of rooms 
+```{r}
+ddply(dat.inc,c("nrooms"),summarise, med.nondur.dur = median(nondur/durables,na.rm=TRUE))
+```
+4. by income decile
+```{r}
+ddply(dat.inc,c("inc.cat"),summarise, med.nondur.dur = median(nondur/durables,na.rm=T))
+```
+5. by both
+```{r}
+ddply(dat.inc,c("nrooms","inc.cat"),summarise, med.nondur.dur = median(nondur/durables))
+```
+
+
+
+
+
+
+# more `ddply{plyr}`
 
 * Split data frame, apply function, and return results in a data frame.
-```{r demo7,message=FALSE}
+```{r,message=FALSE}
 library(plyr)
 ddply(.data=dat.inc,.variables="sex",.fun=summarise,inc=mean(hhinc))  # mean income by sex?
 ddply(dat.inc,c("sex","numads"),summarise,alc=mean(alc),foodin=mean(foodin),foodout=mean(foodout)) 
@@ -481,10 +620,16 @@ ddply(dat.inc,c("sex","numads"),summarise,alc=mean(alc),foodin=mean(foodin),food
 * `summarise` can be many things, not just `mean()`
 * you can supply any function you want
 * check out Hadley's tutorial. ```ddply``` is very powerful.
-```{r demo8}
+```{r}
 ddply(dat.inc,"sex",summarise,age.range=median(age),car.rooms=max(ncars/nrooms)) 
 ddply(subset(dat.inc,numhhkid > 1),"ncars",function(x) data.frame(dur.inc=mean(x$dur/x$hhinc),nondur.inc=mean(x$nondur/x$hhinc)))  # instead of summarise(), supply an "anonymous" function
 ```
+
+# Alternatives to ddply
+* very powerful and elegent package: ```data.table```
+* google "R data.table"
+* you can easily learn this yourself, too little time here
+
 
 # Graphics and R
 
@@ -497,7 +642,7 @@ ddply(subset(dat.inc,numhhkid > 1),"ncars",function(x) data.frame(dur.inc=mean(x
 
 # Base R plots
 
-```{r demo9}
+```{r}
 plot(y=log(dat.inc$ndex),x=log(dat.inc$hhinc)) # many options. see ?plot and ?par
 plot(factor(dat.inc$ncars)) # plot depends on data types
 ```
@@ -509,8 +654,9 @@ plot(factor(dat.inc$ncars)) # plot depends on data types
 * a plot is defined by a set of data that is mapped onto a picture - in many complicated ways, if you so desire
 * the mappings are called ```aes()``` thetics. For example ```aes(x=var1,y=var2)```
 * the way they appear in the picture are called ```geom``` etrics
+* there is a very long list of ```geom```s. Refer to documentation.
 * let's plot log non-durable expenditure against log household income in a scatter plot
-```{r demo10}
+```{r}
 library(ggplot2)  
 p <- ggplot(data=dat.inc,aes(x=log(hhinc),y=log(ndex)))	# not a plot yet: misses a geom
 p + geom_point() # now that's a plot
@@ -518,7 +664,7 @@ p + geom_point() # now that's a plot
 
 # ggplot 2
 
-```{r demo11,cache=TRUE}
+```{r gg1,cache=TRUE,fig.width=10}
 dat <- subset(dat.inc, hhinc>0 & ndex > 0) # get rid of some negative values
 # add another layer: color points by marstat, and decrease opacity to 0.4
 p <- ggplot(data=dat,aes(x=log(hhinc),y=log(ndex)))  # not a plot yet: misses a geom
@@ -526,23 +672,9 @@ p + geom_point(aes(color=marstat), alpha=0.4)
 p + geom_point() + facet_wrap( ~ sex) # split plot by factor sex
 ```
 
-# Create Bins: ```cut()``` an interval
-
-* suppose instead of ```age = {17,18,19,...}``` we want categories of age
-* base R has ```cut()```
-* ggplot2 has derived ```cut_interval()```, bit more intuitive
-
-```{r demo12}
-dat$age.cat <- cut_interval(dat$age,length=5) # add col with age category
-dat$ced.cat <- cut_interval(dat$ageced,length=5) # add col with age at educ completion category
-str(dat$age.cat) # is a factor?
-table(dat$age.cat)
-table(dat$ced.cat)
-```
-
 # More ggplots
 
-```{r demo13,cache=TRUE}
+```{r gg2,cache=TRUE,fig.width=10}
 ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=age.cat),alpha=0.4)
 ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_smooth(aes(color=age.cat),method="lm",se=FALSE) 
 sdat <- subset(dat,ced.cat %in% c("(10,15]","(15,20]","(20,25]") & log(hhinc) > 3& log(hhinc) < 9) # select a subset of ced
@@ -555,7 +687,7 @@ ggplot(data=sdat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=ced.cat),
 * generalized linear models (probit, logit et al): ```glm```
 * loads of packages on [CRAN](http://cran.r-project.org/)
 * specify a model with a formula
-```{r demo14}
+```{r}
 mod.1 <- lm(formula= lndex ~ log(hhinc),data=dat)
 summary(mod.1)
 ```
@@ -563,7 +695,7 @@ summary(mod.1)
 # ```update()``` a model
 
 * easy to iterate on models
-```{r demo15}
+```{r}
 mod.2 <- update(mod.1, . ~ . -1 )  # leave formula as is, but substract the intercept
 mod.3 <- update(mod.1, . ~ . + age + I(age^2) )  # add age and age squared
 coef(summary(mod.2)) # use coef() function to extract coefs only
@@ -573,8 +705,9 @@ coef(summary(mod.3))
 # ```predict()``` data from a model
 
 * use the ```predict()``` function 
+* most regression functions have got their own prediction method.
 * say we want to predict values of lndex from ```mod.3```
-```{r demo16}
+```{r}
 newdat <- expand.grid(hhinc=c(200,300),age=c(20,50,80))
 cbind(newdat,predict(mod.3,newdat))
 ```
@@ -583,7 +716,7 @@ cbind(newdat,predict(mod.3,newdat))
 
 * ```abline()``` is a convenient ```geom``` for this
 * works well for single explanatory variable
-```{r demo17,cache=TRUE}
+```{r gg3,cache=TRUE}
 p <- ggplot(dat,aes(x=log(hhinc),y=lndex))
 p + geom_point() + geom_abline(intercept=coef(mod.1)[1],slope=coef(mod.1)[2],col="red")
 ```
@@ -607,13 +740,13 @@ summary(mod.4)
 
 * How does the distribution of non-durable expenditure vary wity age?
 * How to model this in a regression model?
-```{r demo19,cache=TRUE}
+```{r gg4,cache=TRUE,fig.width=10}
 ggplot(subset(dat,ndex < 1000), aes(x=ndex)) + geom_density(aes(color=age.cat))
 ```
 
 # Age Profile: Quantile Regression
 
-```{r demo20,message=FALSE}
+```{r qr1,message=FALSE,cache=TRUE}
 library(quantreg)
 qreg50 <- rq(formula= ndex ~ age,data=dat,tau=0.5) # median regression
 qreg <- rq(formula= ndex ~ age,data=dat,tau=seq(0.05,0.95,le=10)) # quantile reg at several quantiles
@@ -624,7 +757,7 @@ plot(summary(qreg)) # very nice plotting method
 
 * compare the Conditional Expectation (the OLS estimate) with the conditional quantile function
 * fit a 5-th order polynomial in age
-```{r demo21}
+```{r}
 form <- ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5)
 lin.mod <- lm(formula = form, data=dat)
 taus <- seq(0.1,0.9,le=9) # desired quantiles
@@ -641,7 +774,7 @@ head(preds)
 
 * ggplot works best with long data. 
 * need to ```reshape``` preds into long
-```{r demo22,cache=TRUE,message=FALSE}
+```{r gg5,cache=TRUE,message=FALSE,fig.width=10}
 library(reshape)
 mpreds <- melt(preds,id.vars="age") # now the data is long
 head(mpreds)
@@ -652,11 +785,24 @@ ggplot(subset(mpreds,age>22),aes(x=age,y=value,color=variable)) + geom_line() + 
 
 * R has strong time series capabilities
 * check out 
-  * ```help(ts)```
-  * ```library(zoo)```
-  * ```library(dynlm)```
+    * ```help(ts)```
+    * ```library(zoo)``` for general ordered obs
+    * ```library(dynlm)``` for dynamic regressions
+```{r}
+data(UKDriverDeaths)
+UK <- UKDriverDeaths
+str(UK)
+plot(UK)
+plot(decompose(UK))
+acf(UK)
+pacf(UK)
+```
 
+# How to report results
 
+* [knitr](http://yihui.name/knitr/)
+* [reproducible research](http://cran.open-source-solution.org/web/views/ReproducibleResearch.html)
+* don't copy and paste tables into word (or similar)
 
 
 # How to make this set of slides
