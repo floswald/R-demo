@@ -13,6 +13,15 @@
 >3. A sample applied econometric project using the FES (performs the equivalent operations as James Banks' demonstration for Stata)
 >4. How to make this set of slides. 
 
+# Getting R and RStudio
+>* Go to www.r-project.org and download R for your OS
+>* Go to www.rstudio.org and download RStudio for your OS
+>* **Take a moment to contemplate what you just did**
+    * you downloaded a programme from the internet without paying
+    * what you did was completely legal
+>* Roger Koenker: *Buy a case of wine with what you've saved*
+
+
 # The R Learning Curve
 >* is steep.
 >* However, support is outstanding.
