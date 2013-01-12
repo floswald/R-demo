@@ -763,7 +763,7 @@ ggplot(subset(dat,ndex < 1000), aes(x=ndex)) + geom_density(aes(color=age.cat))
 
 # Age Profile: Quantile Regression
 
-```{r qr1t,cache=TRUE}
+```{r,message=FALSE}
 library(quantreg)
 qreg50 <- rq(formula= ndex ~ age,data=dat,tau=0.5) # median regression
 qreg <- rq(formula= ndex ~ age,data=dat,tau=seq(0.05,0.95,le=10)) # quantile reg at several quantiles
