@@ -20,7 +20,7 @@
 >* **Take a moment to contemplate what you just did**
     * you downloaded a programme from the internet without paying
     * what you did was completely legal
->* [Roger Koenker would say](http://www.econ.uiuc.edu/~roger/courses/LSE/outline/yaRfaq.pdf): *Buy a case of wine with what you've saved*
+>* [As Roger Koenker would say](http://www.econ.uiuc.edu/~roger/courses/LSE/outline/yaRfaq.pdf): *Buy a case of wine with what you've saved*
 
 # Why R?
 
@@ -28,9 +28,10 @@
 >* Availability of add on software (packages)
 >* Very easy to adapt to your needs. You can look at existing code, change it and reuse it.
 >* Ease of connecting to other (faster) software like fortran or C
->* Very active and growing community in science and business.
->* data scientists use R
->* [who else uses R?](http://www.revolutionanalytics.com/what-is-open-source-r/companies-using-r.php) (By now you know Roger Koenker does.)
+>* Who uses R? (Apart from Roger Koenker?)
+    * Very active and growing community in science and business.
+    * data scientists use R
+    * [who in business uses R?](http://www.revolutionanalytics.com/what-is-open-source-r/companies-using-r.php) 
 
 # Why not R?
 
@@ -51,7 +52,12 @@
 # Supplementary material 
 
 * We'll use some sample FES data and a Fortran function at some point
-* if you are a git user type in your terminal `git clone git://github.com/floswald/R-demo.git`
+* if you are a git user type in your terminal 
+
+````
+git clone git://github.com/floswald/R-demo.git
+````
+
 * otherwise go to [https://github.com/floswald/R-demo](https://github.com/floswald/R-demo) and click on the button with the cloud and "ZIP" on it
 
 # Using this set of slides
@@ -65,7 +71,7 @@ x  # print x to screen
 ```
 * the first block is *input*, the second block (marked with `##`) is output
 * everything after `#` is a comment
-* you can (and should) type or copy and paste the code into your R and try around
+* you can (and should) type or copy and paste the code into your R and try around. All of the code you'll see actually works.
 * let's do it.
 
 # Getting `help()`
@@ -81,7 +87,7 @@ x  # print x to screen
     * `if`, `for`, `while`, etc
     * [check out the language definition](http://cran.r-project.org/doc/manuals/R-lang.html) if needed
 * R needs to have all objects in memory (there are exeptions)
-* R's memory is like matlabs and not like stata's
+* R's memory is more like matlabs and less like stata's
     * you can have many objects of different size, type etc
     * (stata's memory is one big spreadsheet. you can store a vector on the side, but it's complicated.)
 
@@ -105,17 +111,16 @@ x
 
 # The functions ```c()```, ```str(x)``` and ```typeof(x)```
 
-* you assign a value, ```R``` decides how to store it
 * ```typeof(x)``` tells you how x was stored, ```mode(x)``` is similar
 * among possible storage types are
-  * ```logical```: TRUE or FALSE
-  * ```integer```: 1, 2, 3, -10, ...
-  * ```double```: 1.0, pi, -3.2331, ...
-  * ```factor```: categorial variables
-    * dummy vars: (0,1) labelled `male`,`female`
-	* categories: (1,2,3) labelled `(2,5],(5,7],(7,10]`	
-  * ```complex```: 0+0i
-  * ```character```: "hello world"
+    * ```logical```: TRUE or FALSE
+    * ```integer```: 1, 2, 3, -10, ...
+    * ```double```: 1.0, pi, -3.2331, ...
+    * ```factor```: categorial variables
+        * dummy vars: (0,1) labelled `male`,`female`
+	      * categories: (1,2,3) labelled `(2,5],(5,7],(7,10]`	
+    * ```complex```: 0+0i
+    * ```character```: "hello world"
 * ```c()``` requires values to have the same type (or it coerces into a common type)
 ```{r coerce}
 typeof(x)
@@ -132,7 +137,7 @@ str(c(x,y))   # compact display of structure of an object
 ```{r subsetx}
 x <- rnorm(n=8) # draw 8 random normal values
 x
-x[3:6] # get elements 3,4,5,6
+x[3:6] # "3:6" produces c(3,4,5,6) 
 x[c(1,5,8)] # elts 1,5 and 8
 x[-c(1,5,8)] # all elts except 1,5 and 8
 ```
@@ -140,7 +145,7 @@ x[-c(1,5,8)] # all elts except 1,5 and 8
 # Helper Functions for allocation: ```seq()``` and ```rep()```
 
 ```{r helpers}
-x <- seq(from=1,to=15,by=3) # also "length" instead of "by"
+x <- seq(from=1,to=15,by=3) # also "length" instead of "by". like matlab linspace()
 x
 str(x)
 y <- rep(1:3,c(2,3,4))
@@ -235,7 +240,7 @@ m1 %*% m2
 * very similar to ```matrix```
 * each row is an observation, each column is a variable
 * create a data.frame from scratch with ```data.frame()```
-* Notice: all columns need to be of the same length! (a data.frame is a rectangle; it's a spreadsheet!)
+* Notice: all columns need to be of the same length (or *recyclable*)! (a data.frame is a rectangle; it's a spreadsheet!)
 ```{r df}
 df <- data.frame(cat.1=rep(1:3,each=2),cat.2=1:2,values=rnorm(6))
 dim(df)
@@ -304,7 +309,10 @@ summary(LS) # function summary()
 
 * rearrange row indices by a certain criterion
 * ```order()``` and ```sort()```
-* function order(x) returns the indices of x in ascending/descending order
+* function order(x) returns the indices of x in ascending/descending order:
+```{r}
+order(c(5,2,6,1),decreasing=TRUE)
+```
 * plugging in a vector of indices into a matrix/data.frame, reorders the matrix according to those:
 ```{r order}
 save.ranking <- order(LS$sr,decreasing=TRUE)	
@@ -319,8 +327,8 @@ head(LS[save.ranking,])
 # finding packages
 
 * googling what you want to do often helps
-* for example google *R optimization* takes you here
-* [http://cran.r-project.org/web/views/Optimization.html](http://cran.r-project.org/web/views/Optimization.html)
+* for exampe, [let me google "R optimization" for you](http://lmgtfy.com/?q=R+optimization)
+
 
 # installing packages
 
@@ -409,7 +417,11 @@ fruit
 # Your Solution 2
 
 * you can input the values by hand, for example 
-* ```apples <- data.frame(price=c(1.1,2.9,1.6),quantity=c(2,3,1))```
+
+```
+apples <- data.frame(price=c(1.1,2.9,1.6),quantity=c(2,3,1))
+```
+
 * I used the uniform random generator ```runif()``` for prices and ```sample()``` for quantities
 
 ```{r sol4}
@@ -438,28 +450,28 @@ plot(new.fac)
 # Contingency Tables of multiple Factors
 * `table()` can count cases of factors against each other
 ```{r}
-UCB <- as.data.frame(UCBAdmissions) 	# load built in data
-head(UCB)
+UCB <- as.data.frame(UCBAdmissions) 	# load built-in data on Berkeley admissions
+tail(UCB) # this time, display the last 6 rows
 summary(UCB)	# notice how summary treats factors and numerics
 table(UCB$Admit,UCB$Dept) 	# table admit vs Dept?
 ```
 * But is that what we want here?
 
 # Contingency tables 2
-* No! We want to know "Freq" by those categories.
+* No! We want to know "Freq" by those categories (those ```factors```).
 * In R-speak, what is the relationship ```Freq ~ factors```?
 * `xtabs()`
   * takes a ```formula``` as an argument
   * typical formula: ```y ~ x + z``` means "y is explained by x and z"
 ```{r}
-xtabs(Freq ~ Admit + Dept,data=UCB)	# Freq is explained by Admit and Gender
+xtabs(Freq ~ Admit + Dept,data=UCB)	# Freq is explained by Admit and Dept
 xtabs(Freq ~ Admit + Gender,data=UCB)
 ```
 
-# Your turn 4
+# Your turn 3
 * create a table that shows the number of admissions/rejections by gender AND department.
 
-# Your Solution 4
+# Your Solution 3
 ```{r}
 xtabs(Freq ~ Admit + Gender + Dept,data=UCB)
 ```
@@ -481,8 +493,8 @@ ls()
 
 ## Food and Expenditure Survey (FES)
 
-* [click here to download the data from moodle in a zip](https://moodle.ucl.ac.uk/mod/resource/view.php?id=1145211)
-* zip contains 4 files, 2 in .csv and 2 in .dta format
+* the repository you downloaded from github contains a folder "data"
+* contains 4 files, 2 in .csv and 2 in .dta format
 * each format has one data file ("fesdat") and one file on income ("fesinc")
 
 ## Agenda
@@ -518,8 +530,8 @@ fesinc.csv <- read.csv(file="data/fesinc.csv") # read the income data in csv for
 library(foreign)  # load foreign to read stata data
 fesdat.dta <- read.dta(file="data/fesdat2005.dta") 
 fesinc.dta <- read.dta(file="data/fesinc2005.dta") 
+head(fesdat.dta) # do they look the same?
 head(fesdat.csv)
-head(fesdat.dta)
 ```
 
 # Summary
@@ -615,8 +627,10 @@ table(dat.inc$inc.cat)
 * functions work on an entire data.frame
 ```{r demoplyr,message=FALSE}
 library(plyr)
-summarise(dat.inc,mhhinc = mean(hhinc), vhhinc = sd(hhinc), mnumads=mean(numads)) # summarise over an entire data.frame
-head(transform(dat.inc,inc.rank = rank(hhinc)),10) # add "income rank". head(...,10) to see first 10 lines only
+# summarise an entire data.frame
+summarise(dat.inc,mhhinc = mean(hhinc), vhhinc = sd(hhinc), mnumads=mean(numads)) 
+# add "income rank" to dat.inc. head(...,10) to see first 10 lines only
+head(transform(dat.inc,inc.rank = rank(hhinc)),10) 
 ```
 
 # ```summarise()``` and ```transform()``` by groups?
@@ -697,7 +711,7 @@ dat.tab <- data.table(dat.inc)
 tables()
 dat.tab[,list(median.age=as.numeric(median(age)),cars.over.rooms=median(ncars/nrooms)),by=sex]
 # adding a column "by reference" with :=
-dat.tab[,rel.inc := hhinc/median(hhinc)]  # You only need to type := here. strange display.
+dat.tab[,rel.inc := hhinc/median(hhinc)]  # I typed "rel.inc := hhinc/median(hhinc)" here. 
 dat.tab[,rel.inc.sex := hhinc/median(hhinc),by=sex]
 dat.tab[,rel.inc.sex.nrooms := hhinc/median(hhinc),by=list(sex,nrooms)]
 ```
@@ -763,7 +777,9 @@ p + geom_point() + facet_wrap( ~ sex) # split plot by factor sex
 ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=age.cat),alpha=0.4)
 ggplot(data=dat,aes(x=log(hhinc),y=log(ndex))) + geom_smooth(aes(color=age.cat),method="lm",se=FALSE) 
 sdat <- subset(dat,ced.cat %in% c("(10,15]","(15,20]","(20,25]") & log(hhinc) > 3& log(hhinc) < 9) # select a subset of ced
-ggplot(data=sdat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=ced.cat),alpha=0.3) + geom_smooth(aes(color=ced.cat),se=FALSE,size=1)  
+ggplot(data=sdat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=ced.cat),alpha=0.3) + geom_smooth(aes(color=ced.cat),se=FALSE,size=1)
+# split by sex?
+ggplot(data=sdat,aes(x=log(hhinc),y=log(ndex))) + geom_point(aes(color=ced.cat),alpha=0.3) + geom_smooth(aes(color=ced.cat),se=FALSE,size=1) + facet_wrap(~sex)
 ```
 
 # Regression Models
@@ -842,16 +858,16 @@ plot(summary(qreg)) # very nice plotting method
 
 * compare the Conditional Expectation (the OLS estimate) with the conditional quantile function
 * fit a 5-th order polynomial in age
-```{r}
-form <- ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5)
+```{r,tidy=FALSE}
+form    <- ndex ~ age + I(age^2) + I(age^3) + I(age^4) + I(age^5)
 lin.mod <- lm(formula = form, data=dat)
-taus <- seq(0.1,0.9,le=9) # desired quantiles
-qr.mod <- rq(formula= form,data=dat,tau=taus)
-ages <- sort(unique(dat$age)) # vector of ages in data
+taus    <- seq(0.1,0.9,le=9) # desired quantiles
+qr.mod  <- rq(formula= form,data=dat,tau=taus)
+ages    <- sort(unique(dat$age)) # vector of ages in data
 # create data.frame with cols "age", and a prediction for each model
-preds <- data.frame(age = ages, OLS= predict(lin.mod, newdata = data.frame(age = ages)))
+preds   <- data.frame(age = ages, OLS= predict(lin.mod, newdata = data.frame(age = ages)))
 # add qreg predictions
-preds <- cbind(preds, predict(qr.mod,data.frame(age=ages)))
+preds   <- cbind(preds, predict(qr.mod,data.frame(age=ages)))
 head(preds)
 ```
 
@@ -871,8 +887,8 @@ ggplot(subset(mpreds,age>22),aes(x=age,y=value,color=variable)) + geom_line() + 
 * R has strong time series capabilities
 * base time series architecture in `ts()`
 * more advanced ways to deal with time/date classes
-  * [Lubridate](http://cran.r-project.org/web/packages/lubridate/index.html)
-  * [xts](http://cran.r-project.org/web/packages/xts/index.html)
+    * [Lubridate](http://cran.r-project.org/web/packages/lubridate/index.html)
+    * [xts](http://cran.r-project.org/web/packages/xts/index.html)
 * check out 
     * [CRAN Time Series Task View: General Overview](http://cran.stat.ucla.edu/web/views/TimeSeries.html)
     * ```library(zoo)``` for general ordered obs
@@ -928,10 +944,10 @@ R CMD SHLIB bar.f
 
 * It's already compiled in the github repository so no need to if you downloaded that.
 * finally, in R we need to load the *dynamic library* and call the function
-```{r}
+```{r,tidy=FALSE}
 dyn.load("bar.so")
 how.many <- 5L # L means integer
-y <- rnorm(how.many)
+y        <- rnorm(how.many)
 r.result <- y^2
 # ideally we have a wrapper on .Fortran to check sanity of input
 f.result <- .Fortran("bar", n=how.many, x=y) # .Fortran returns a list
@@ -948,6 +964,7 @@ identical(r.result,f.result$x) #identical?
     * `library(RcppArmadillo)`: interface to the Armadillo C++ matrix algebra library. Armadillo is close to matlab.
     * `library(RcppEigen)`: interface to the C++ Eigen libraries. Eigen is a very versatile matrix algebra library. Great for sparse matrices.
     * `library(RcppSimpleTensor)`: [High dimensional computations made easy](https://github.com/tlamadon/RcppSimpleTensor)
+    * many more
 * you can write C code *inline* and test it
 
 # R and C++ inline
@@ -958,9 +975,9 @@ library(inline)
 my.cpp.code <- "NumericVector xx(x); 
                 return wrap( std::accumulate( xx.begin(), xx.end(), 0.0));"
 my.cpp.fun  <- cxxfunction( signature( x="numeric"), body=my.cpp.code, plugin="Rcpp")
-y        <- seq(1,10,0.5)
-r.result <- sum(y)
-c.result <- my.cpp.fun(y)
+y           <- seq(1,10,0.5)
+r.result    <- sum(y)
+c.result    <- my.cpp.fun(y)
 identical(r.result,c.result)
 ```
 

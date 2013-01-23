@@ -69,7 +69,7 @@ m1[, "col2"]
 colnames(m1) <- NULL  # remove colnames
 
 # basic matrix arithmetic
-m1 + m2	# error
+#m1 + m2	# error
 
 # Your turn 2
 # Your solution 2
@@ -193,7 +193,7 @@ ls()
 # A Sample Applied Econometric Project
 # Reading Data Files
 # Read FES
-setwd(dir = "~/Dropbox/git/R-demo/")  # set working directory
+setwd(dir = "~/git/R-demo/")  # set working directory
 fesdat.csv <- read.csv(file = "data/fesdat.csv")  # read the data in csv format. Note that 'file' could also be a URL
 fesinc.csv <- read.csv(file = "data/fesinc.csv")  # read the income data in csv format
 library(foreign)  # load foreign to read stata data
@@ -277,6 +277,21 @@ ddply(dat.inc, c("sex", "numads"), summarise, alc = mean(alc), foodin = mean(foo
 ddply(dat.inc, "sex", summarise, age.range = median(age), car.rooms = max(ncars/nrooms))
 ddply(subset(dat.inc, numhhkid > 1), "ncars", function(x) data.frame(dur.inc = mean(x$durables/x$hhinc), 
     nondur.inc = mean(x$nondur/x$hhinc)))  # instead of summarise(), supply an 'anonymous' function
+
+# with data.table
+library(data.table)
+dat.tab <- data.table(dat.inc)
+tables()
+dat.tab[,list(median.age=as.numeric(median(age)),cars.over.rooms=median(ncars/nrooms)),by=sex]
+dat.tab[,rel.inc := hhinc/median(hhinc)]
+dat.tab[,rel.inc.sex := hhinc/median(hhinc),by=sex]
+dat.tab[,rel.inc.sex.nrooms := hhinc/median(hhinc),by=list(sex,nrooms)]
+
+# data.tables and keys
+setkey(dat.tab,numhhkid)
+dat.tab[numhhkid==1]
+dat.tab[J(1)]
+dat.tab[J(2),twokid.foodin := log(foodin)/log(foodout)]
 
 # Graphics and R
 # Base R plots
@@ -364,3 +379,13 @@ plot(UK)
 plot(decompose(UK))
 acf(UK)
 pacf(UK)
+
+# R and foreign languagues
+
+library(inline)
+my.cpp.code <- "NumericVector xx(x); return wrap( std::accumulate( xx.begin(), xx.end(), 0.0));"
+my.cpp.fun <- cxxfunction( signature( x="numeric"), body=my.cpp.code, plugin="Rcpp")
+y <- seq(1,10,0.5)
+r.result <- sum(y)
+c.result <- my.cpp.fun(y)
+identical(r.result,c.result)
