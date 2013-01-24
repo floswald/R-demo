@@ -979,6 +979,9 @@ y           <- seq(1,10,0.5)
 r.result    <- sum(y)
 c.result    <- my.cpp.fun(y)
 identical(r.result,c.result)
+# if you want to see what's going on under the hood:
+my.cpp.fun  <- cxxfunction( signature( x="numeric"), body=my.cpp.code, plugin="Rcpp", verbose=TRUE)
+
 ```
 
 # How to report results
